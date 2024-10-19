@@ -4,6 +4,20 @@ include '../conn.php';
 session_start();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Google reCAPTCHA secret key
+    $secretKey = "6LfL8mUqAAAAANpODH758b9EVgK3A5k7dJdd5q4h";
+    
+    $captcha = $_POST['g-recaptcha-response'];
+
+    // Verify the reCAPTCHA response with Google
+    $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$secretKey&response=$captcha");
+    $responseKeys = json_decode($response, true);
+
+    if (intval($responseKeys["success"]) !== 1) {
+        echo json_encode(['success' => false, 'message' => 'CAPTCHA validation failed.']);
+        exit;
+    }
+
     $email = $_POST['email'];
     $password = $_POST['password'];
 

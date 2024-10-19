@@ -50,6 +50,7 @@ if ($isLoggedIn) {
     <script src="node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <title>Plant-Bazaar</title>
 </head>
 
@@ -129,6 +130,7 @@ if ($isLoggedIn) {
             <div class="error-label" style="display: none;"></div>
             <input type="password" id="loginPassword" placeholder="Password" required>
             <div class="error-label" style="display: none;"></div>
+            <div class="g-recaptcha" data-sitekey="6LfL8mUqAAAAAB5RfKDVCgiEFCNPJ7Y1emjO3E9D"></div>
             <button type="submit">Login</button>
         </form>
         <p>Don't have an account? <a href="#" id="signupLink">Sign Up</a></p>
@@ -145,6 +147,7 @@ if ($isLoggedIn) {
 <div id="signupModal" class="modal">
     <div class="modal-content">
         <span class="close">&times;</span>
+
         <h2>Sign Up</h2>
         <form method="POST" action="" id="signupForm" enctype="multipart/form-data">
             <div class="form-group">
@@ -385,13 +388,27 @@ $(document).ready(function() {
 $("#loginForm").submit(function(event) {
     event.preventDefault();
 
+    var recaptchaResponse = grecaptcha.getResponse();
+
+    // Check if the reCAPTCHA is completed
+    if (recaptchaResponse === "") {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Please complete the reCAPTCHA."
+            });
+            return; // Exit if reCAPTCHA is not completed
+        }
+
     var email = $("#loginEmail").val();
     var password = $("#loginPassword").val();
+
+
 
     $.ajax({
         url: "Ajax/login.php",
         type: "POST",
-        data: { email: email, password: password },
+        data: {email: email, password: password,'g-recaptcha-response': recaptchaResponse},
         dataType: 'json',
         success: function(response) {
             console.log("Response: " + JSON.stringify(response));

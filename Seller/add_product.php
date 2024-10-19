@@ -20,6 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   $city = $_POST['city'];
   $barangay = $_POST['barangay'];
   $street = $_POST['street'];
+  $status = 1;
   
   $img1 = $_FILES['img1']['name'];
   $img2 = $_FILES['img2']['name'];
@@ -52,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   $seller_id = mysqli_fetch_assoc($result)['seller_id'];
 
   // Insert the data into the database
-  $query = "INSERT INTO product (added_by, plantname, plantcolor, plantsize, details, price, plantcategories, region, province, city, barangay, street, img1, img2, img3) VALUES ('$seller_id', '$plantname', '$plantcolor', '$plantsize', '$plantdetails', '$price', '$plantcategories', '$region', '$province', '$city', '$barangay', '$street', '$img1', '$img2', '$img3')";
+  $query = "INSERT INTO product (added_by, plantname, plantcolor, plantsize, details, price, plantcategories, region, province, city, barangay, street, img1, img2, img3, status) VALUES ('$seller_id', '$plantname', '$plantcolor', '$plantsize', '$plantdetails', '$price', '$plantcategories', '$region', '$province', '$city', '$barangay', '$street', '$img1', '$img2', '$img3', '$status')";
   $result = mysqli_query($conn, $query);
 
   // Output JSON data

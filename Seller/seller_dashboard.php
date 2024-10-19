@@ -106,27 +106,27 @@ include 'nav.php';
                 <label for="Location">Location:</label>
                 <div class="col-sm-6 mb-3">
                 <label class="form-label">Region <span class="text-danger">*</span></label>
-                <select name="region" class="form-control form-control-md" id="region"></select>
-                <input type="hidden" class="form-control form-control-md" name="region" id="region-text" required>
+                <select name="region" class="region" id="region"></select>
+                <input type="text" class="region-text" name="region" id="region-text" required>
                 </div>
                 <div class="col-sm-6 mb-3">
                 <label class="form-label">Province *</label>
-                <select name="province" class="form-control form-control-md" id="province"></select>
-                <input type="hidden" class="form-control form-control-md" name="province" id="province-text" required>
+                <select name="province" class="province" id="province"></select>
+                <input type="hidden" class="province-text" name="province" id="province-text" required>
                 </div>
                 <div class="col-sm-6 mb-3">
                 <label class="form-label">City / Municipality *</label>
-                <select name="city" class="form-control form-control-md" id="city"></select>
-                <input type="hidden" class="form-control form-control-md" name="city" id="city-text" required>
+                <select name="city" class="city" id="city"></select>
+                <input type="hidden" class="city-text" name="city" id="city-text" required>
                 </div>
                 <div class="col-sm-6 mb-3">
                 <label class="form-label">Barangay *</label>
-                <select name="barangay" class="form-control form-control-md" id="barangay"></select>
-                <input type="hidden" class="form-control form-control-md" name="barangay" id="barangay-text" required>
+                <select name="barangay" class="barangay" id="barangay"></select>
+                <input type="hidden" class="barangay-text" name="barangay" id="barangay-text" required>
                 </div>
                 <div class="col-md-6 mb-3">
                 <label for="street-text" class="form-label">Street (Optional)</label>
-                <input type="text" class="form-control form-control-md" name="street" id="street-text">
+                <input type="text" class="street-text" name="street" id="street-text">
                 </div>
 
                 <div class="image-upload-container">
@@ -202,27 +202,27 @@ include 'nav.php';
             <label for="editLocation">Location:</label>
             <div class="col-sm-6 mb-3">
             <label class="form-label">Region <span style="color:red;">*</span></label>
-            <select name="editregion" class="region" id="region"></select>
-            <input type="hidden" class="editregion" name="editregion" id="region-text" required>
+            <select name="editregion" class="region" id="region1"></select>
+            <input type="hidden" class="editregion" name="editregion" id="region-text1" required>
             </div>
         <div class="col-sm-6 mb-3">
             <label class="form-label">Province *</label>
-            <select name="eprovince" class="province" id="province"></select>
-            <input type="hidden" class="editprovince" name="editprovince" id="province-text" required>
+            <select name="eprovince" class="province" id="province1"></select>
+            <input type="hidden" class="editprovince" name="editprovince" id="province-text1" required>
         </div>
         <div class="col-sm-6 mb-3">
             <label class="form-label">City / Municipality *</label>
-            <select name="ecity"  class="city" id="city"></select>
-            <input type="hidden" class="editcity" name="editcity" id="city-text" required>
+            <select name="ecity"  class="city" id="city1"></select>
+            <input type="hidden" class="editcity" name="editcity" id="city-text1" required>
         </div>
         <div class="col-sm-6 mb-3">
             <label class="form-label">Barangay *</label>
-            <select name="ebarangay" class="barangay" id="barangay"></select>
-            <input type="hidden" class="editbarangay" name="editbarangay" id="barangay-text" required>
+            <select name="ebarangay" class="barangay" id="barangay1"></select>
+            <input type="hidden" class="editbarangay" name="editbarangay" id="barangay-text1" required>
         </div>
         <div class="col-md-6 mb-3">
             <label for="street-text" class="form-label">Street (Optional)</label>
-            <input type="hidden" class="editstreet" name="editstreet" id="street-text">
+            <input type="text" class="editstreet" name="editstreet" id="street-text1">
         </div>
 
             <label for="editPrice">Price:</label>
@@ -270,6 +270,7 @@ include 'nav.php';
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="ph-address-selector.js"></script>
+    <script src="ph-address-selector_1.js"></script>
     <script>
 
   // Add event listeners to image inputs to preview images
@@ -363,7 +364,6 @@ function fetchProducts(page = 1) {
 
             data.products.forEach(function(product) {
             const card = $('<div>').addClass('card');
-            card.append($('<h1>').text(product.plantname));
             const imgSrc = '../Products/' + product.seller_email + '/' + product.img1;
                 if (product.img1 === '') {
                     if (product.img2 !== '') {
@@ -375,6 +375,7 @@ function fetchProducts(page = 1) {
                     }
                 }
             card.append($('<img>').attr('src', imgSrc).attr('alt', product.plantname));
+            card.append($('<h1>').addClass('card-title').text(product.plantname));
             card.append($('<p>').text('Price: ₱' + product.price));
             card.append($('<p>').text('Category: ' + product.plantcategories));
             // Create a container for the buttons
@@ -617,6 +618,9 @@ $(document).on('click', '.delete-button', function() {
     $('#confirmDeleteButton').off('click').on('click', function() {
         // Redirect to delete script
         window.location.href = 'delete_product.php?plantid=' + plantId;
+    });$('#cancelDeleteButton').off('click').on('click', function() {
+        // Close the modal
+        $('#deleteConfirmationModal').hide();
     });
 });
 

@@ -47,7 +47,7 @@ if ($isLoggedIn) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4/dist/css/splide.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4/dist/js/splide.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    <script src="node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
+    <script src="../node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <title>Plant-Bazaar</title>
@@ -502,22 +502,21 @@ $(document).on('click', '#logoutLink', function(event) {
         event.preventDefault();
 
         $.ajax({
-            url: 'Ajax/logout.php', // Path to your logout.php file
+            url: 'ajax/logout.php', // Path to your logout.php file
             type: 'POST',
             success: function(response) {
                 if (response.trim() === "success") {
+                    document.querySelector('.container').innerHTML = '';
                     Swal.fire({
                         position: 'center',
                         icon: 'success',
                         title: 'Successfully Logged out',
                         showConfirmButton: false,
-                        timer: 3000
                     });
                     // Reload page after 3 seconds
                     setTimeout(function() {
-                        location.reload();
-                        window.location.href = " ";
-                    }, 3000);
+                        window.location.href = "../index";
+                    }, 2000);
                 } else {
                     Swal.fire({
                         icon: 'error',

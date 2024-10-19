@@ -214,39 +214,46 @@ body::-webkit-scrollbar-thumb {
 .card-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 15px;
-    padding: 10px;
-}
-.newly-contents {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 15px;
-    padding: 10px;
+    gap: 20px;
+    padding: 20px;
 }
 .card {
     border: 1px solid #ddd;
     border-radius: 8px;
     padding: 15px;
-    background-color: #f9f9f9; /* Light gray background */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    text-align: center;
     gap: 10px;
 }
 .card img {
     width: 100%;
-    height: 100%; /* Maintain aspect ratio */   
-    max-height: 300px;
+    height: 180px; /* Fixed height for uniform appearance */
     object-fit: cover;
     border-radius: 5px;
 }
-.card p{
+.card-title {
+    font-size: medium;
+    color: #333;
+    text-transform: uppercase;
+    text-align: center;
+}
+.card p {
     margin: 5px 0;
+    font-size: 1rem;
+    color: #555;
+    margin-top: auto;
+    line-height: 2.5;
 }
 .card a{
     margin-top: auto;
 }
+
 
 .plant-item {
     border: 1px solid #ddd;
@@ -318,10 +325,12 @@ body::-webkit-scrollbar-thumb {
     font-size: 24px;
 }
 
+/* Button Container */
 .button-container {
     display: flex;
-    gap: 15px; /* Increased space between buttons */
-    margin-top: 10px;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: auto; /* Push buttons to the bottom of the card */
 }
 
 .button-container a {
@@ -331,6 +340,15 @@ body::-webkit-scrollbar-thumb {
     background-color: #386641; /* Green background */
     color: #fff; /* White text */
     transition: background-color 0.3s; /* Transition for hover effect */
+}
+.edit-button, .delete-button {
+    width: 48%;
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 .button-container a:hover {
@@ -345,11 +363,11 @@ body::-webkit-scrollbar-thumb {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
 }
 
-.main-content h1 {
+/* .main-content h1 {
     font-size: 24px;
     color: #352208;
     margin-bottom: 20px;
-}
+} */
 
 .product-list h2 {
     font-size: 20px;

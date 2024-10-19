@@ -51,6 +51,7 @@ if ($isLoggedIn) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <script src="node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+    <script src="https://www.google.com/recaptcha/enterprise.js?render=6Lcv5mUqAAAAABNZ9eLdrYxpn8OWSacrmhefh9I3"></script>
     <title>Plant-Bazaar</title>
 </head>
 
@@ -106,6 +107,24 @@ if ($isLoggedIn) {
                             // Add plant items to contentHtml
                             plantsByLocation[location].forEach(function(product) {
                                 let imgPath = `Products/${product.seller_email}/${product.img1}`;
+
+                                let createdAt = new Date(product.createdAt); // Convert to Date object
+                                let currentTime = new Date();
+                                let timeDiffInHours = Math.floor((currentTime - createdAt) / (1000 * 60 * 60));
+                                let timeDiffInDays = Math.floor(timeDiffInHours / 24);
+                                let timeDiffInWeeks = Math.floor(timeDiffInDays / 7);
+
+                                // Display time ago based on the time difference
+                                let timeAgoText = '';
+                                if (timeDiffInHours < 1) {
+                                    timeAgoText = 'Just now';
+                                } else if (timeDiffInHours < 24) {
+                                    timeAgoText = `${timeDiffInHours} hours ago`;
+                                } else if (timeDiffInDays < 7) {
+                                    timeAgoText = `${timeDiffInDays} days ago`;
+                                } else {
+                                    timeAgoText = `${timeDiffInWeeks} weeks ago`;
+                                }
                                 contentHtml += `
                                     <div class="plant-item" data-location="${product.city}">
                                         <div class="plant-image">
@@ -113,6 +132,8 @@ if ($isLoggedIn) {
                                         </div>
                                         <p>${product.plantname}</p>
                                         <p>Price: ₱${product.price}</p>
+                                        <p>Category: ${product.plantcategories}</p>
+                                        <p style="font-size: 12px;">Posted: ${timeAgoText}</p>
                                         <div class="plant-item-buttons">
                                             <button class="view-details" data-id="${product.plantid}" data-email="${product.seller_email}">View Details</button>
                                             <button class="chat-seller" data-email="${product.seller_email}" >Chat Seller</button>

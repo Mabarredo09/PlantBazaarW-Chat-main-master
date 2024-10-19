@@ -54,10 +54,7 @@ var my_handlers = {
         dropdown.append('<option selected="true" disabled>Choose State/Province</option>');
         dropdown.prop('selectedIndex', 0);
 
-        let dropdown1 = $('.province');
-        dropdown1.empty();
-        dropdown1.append('<option selected="true" disabled>Choose State/Province</option>');
-        dropdown1.prop('selectedIndex', 0);
+      
 
         //city
         let city = $('#city');
@@ -65,10 +62,7 @@ var my_handlers = {
         city.append('<option selected="true" disabled></option>');
         city.prop('selectedIndex', 0);
 
-        let city1 = $('.city');
-        city.empty();
-        city.append('<option selected="true" disabled></option>');
-        city.prop('selectedIndex', 0);
+        
 
         //barangay
         let barangay = $('#barangay');
@@ -76,10 +70,6 @@ var my_handlers = {
         barangay.append('<option selected="true" disabled></option>');
         barangay.prop('selectedIndex', 0);
 
-        let barangay1 = $('.barangay');
-        barangay.empty();
-        barangay.append('<option selected="true" disabled></option>');
-        barangay.prop('selectedIndex', 0);
 
 
         // filter & fill
@@ -118,10 +108,7 @@ var my_handlers = {
         dropdown.append('<option selected="true" disabled>Choose city/municipality</option>');
         dropdown.prop('selectedIndex', 0);
 
-        let dropdown1 = $('.city');
-        dropdown.empty();
-        dropdown.append('<option selected="true" disabled>Choose city/municipality</option>');
-        dropdown.prop('selectedIndex', 0);
+       
 
         //barangay
         let barangay = $('#barangay');
@@ -129,10 +116,7 @@ var my_handlers = {
         barangay.append('<option selected="true" disabled></option>');
         barangay.prop('selectedIndex', 0);
 
-        let barangay1 = $('.barangay');
-        barangay.empty();
-        barangay.append('<option selected="true" disabled></option>');
-        barangay.prop('selectedIndex', 0);
+       
 
         // filter & fill
         var url = 'ph-json/city.json';
@@ -169,11 +153,7 @@ var my_handlers = {
         dropdown.append('<option selected="true" disabled>Choose barangay</option>');
         dropdown.prop('selectedIndex', 0);
 
-        // barangay
-        let dropdown1 = $('.barangay');
-        dropdown.empty();
-        dropdown.append('<option selected="true" disabled>Choose barangay</option>');
-        dropdown.prop('selectedIndex', 0);
+     
 
         // filter & Fill
         var url = 'ph-json/barangay.json';
@@ -210,21 +190,12 @@ $(function() {
     $('#city').on('change', my_handlers.fill_barangays);
     $('#barangay').on('change', my_handlers.onchange_barangay);
 
-    $('.region').on('change', my_handlers.fill_provinces);
-    $('.province').on('change', my_handlers.fill_cities);
-    $('.city').on('change', my_handlers.fill_barangays);
-    $('.barangay').on('change', my_handlers.onchange_barangay);
-
     // load region
     let dropdown = $('#region');
     dropdown.empty();
     dropdown.append('<option selected="true" disabled>Choose Region</option>');
     dropdown.prop('selectedIndex', 0);
 
-    let dropdown1 = $('.region');
-    dropdown.empty();
-    dropdown.append('<option selected="true" disabled>Choose Region</option>');
-    dropdown.prop('selectedIndex', 0);
     const url = 'ph-json/region.json';
     // Populate dropdown with list of regions
     $.getJSON(url, function(data) {
