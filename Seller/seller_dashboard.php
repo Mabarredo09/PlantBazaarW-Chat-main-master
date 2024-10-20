@@ -55,6 +55,7 @@ include 'nav.php';
 <!-- Start of Main Content  -->
 <div class="main-content">
     <h1>Welcome to Your Seller Dashboard</h1>
+    <button id="viewSoldHistoryButton">View Sold Listings History</button>
     <div class="product-list">
         <h2>Your Listed Plants</h2>
         <div class="card-container">
@@ -350,15 +351,38 @@ document.getElementById('img3').addEventListener('change', function() {
 
 $(document).ready(function() {
 
-    let currentpage = 1;
-    const productsPerPage = 4 ;
+let currentpage = 1;
+const productsPerPage = 4 ;
+let currentView = 'available'; // Track current view (available or sold)
 
-function fetchProducts(page = 1) {
+
+// Handle "View Sold Listings History" button click
+$('#viewSoldHistoryButton').on('click', function() {
+    if (currentView === 'available') {
+        currentView = 'sold-history';
+        $(this).text('View Available Listings'); // Change button text to switch back to available listings
+        fetchProducts(1, 'sold-history'); // Fetch sold products
+    } else {
+        currentView = 'available';
+        $(this).text('View Sold Listings History'); // Change button text back to sold listings
+        fetchProducts(1, 'available'); // Fetch available products
+    }
+});
+
+
+function fetchProducts(page = 1, viewType='available') {
+    
+    // 0 is temporarily set for available listings, will be changed to 1 when we fixed the adding of plants that sets the listing to 1 as default
+
+    let status = viewType === 'sold-history' ? 2 : 0; // 0 for available, 2 for sold history
+    
     $.ajax({
         url: 'fetch_listed_plants.php',
         type: 'GET',
         dataType: 'json', // Specify the expected data type as JSON
-        data: {page: page},
+        data: {page: page,
+            listing_status: status
+        },
         success: function(data) {
             const productContainer = $('.card-container');
             productContainer.empty();
@@ -379,8 +403,13 @@ function fetchProducts(page = 1) {
             card.append($('<h1>').addClass('card-title').text(product.plantname));
             card.append($('<p>').text('Price: ₱' + product.price));
             card.append($('<p>').text('Category: ' + product.plantcategories));
+            
+
+
+             if (viewType === 'available') {
             // Create a container for the buttons
             const buttonContainer = $('<div>').addClass('button-container');
+             // For available listings, add edit and delete buttons
             // Create the Edit button
             const editButton = $('<button>')
                 .addClass('edit-button') // Add a class for CSS styling and event handling
@@ -397,41 +426,59 @@ function fetchProducts(page = 1) {
                     cursor: 'pointer', // Pointer cursor on hover
                     borderRadius: '5px' // Rounded corners
                 });
-
             // Create the Delete button
             const deleteButton = $('<button>')
                 .addClass('delete-button') // Add a class for CSS styling
                 .data('plantid', product.plantid) // Store the plant ID in a data attribute
                 .text('Delete Listing') // Set the button text
+                 .css({
+                            backgroundColor: '#f44336', // Red background
+                            color: 'white', // White text
+                            border: 'none', // No border
+                            padding: '10px 15px', // Padding for the button
+                            textAlign: 'center', // Center text
+                            fontSize: '16px', // Font size
+                            margin: '4px 2px', // Margin around the button
+                            cursor: 'pointer', // Pointer cursor on hover
+                            borderRadius: '5px' // Rounded corners
+                        });
+            const markAsSoldButton = $('<button>')
+                .addClass('mark-sold-button') // Add a class for CSS styling
+                .data('plantid', product.plantid) // Store the plant ID in a data attribute
+                .text('Mark as Sold') // Set the button text
                 .css({
-                    backgroundColor: '#f44336', // Red background
-                    color: 'white', // White text
-                    border: 'none', // No border
-                    padding: '10px 15px', // Padding for the button
-                    textAlign: 'center', // Center text
-                    fontSize: '16px', // Font size
-                    margin: '4px 2px', // Margin around the button
-                    cursor: 'pointer', // Pointer cursor on hover
-                    borderRadius: '5px' // Rounded corners
-                });
+                            backgroundColor: 'black', // Red background
+                            color: '#f8f8f8', // White text
+                            border: '1px solid #ccc', // No border
+                            padding: '10px 15px', // Padding for the button
+                            textAlign: 'center', // Center text
+                            fontSize: '16px', // Font size
+                            margin: '4px 2px', // Margin around the button
+                            cursor: 'pointer', // Pointer cursor on hover
+                            borderRadius: '5px' // Rounded corners
+                        });
 
-            // Append buttons to the button container
-            buttonContainer.append(editButton);
-            buttonContainer.append(deleteButton);
-
+                    // Append buttons to the button container
+                    buttonContainer.append(editButton);
+                    buttonContainer.append(deleteButton);
+                    buttonContainer.append(markAsSoldButton);
+                    card.append(buttonContainer);
+                    } else {
+                    }
             // Append the buttonContainer to your product card
             // Example: $('#productCard').append(buttonContainer);
 
-
-                card.append(buttonContainer); // Append the button container to the card
                 productContainer.append(card);
             });
-
+                    if (viewType === 'sold-history' && data.length === 0) {
+                        productContainer.append($('<p>').text('You have no sold listings.'));
+                        
+                    }
                         if (data.length === 0) {
                             productContainer.append($('<p>').text('You have no plants listed.'));
                         }
 
-                        setupPagination(data.total);
+                        setupPagination(data.total, viewType);
                     },
                     error: function(xhr, status, error) {
                         console.error("Request failed:", error);
@@ -439,7 +486,7 @@ function fetchProducts(page = 1) {
                 });
     }
 
-    function setupPagination(totalProducts) {
+    function setupPagination(totalProducts, viewType) {
         const paginationContainer = $('.pagination');
         paginationContainer.empty(); // Clear existing pagination
 
@@ -774,6 +821,34 @@ $('#editProductForm').on('submit', function(e) {
         }
     });
 });
+
+$(document).on('click', '.mark-sold-button', function() {
+    var plantId = $(this).data('plantid'); // Get the plant ID
+    console.log(plantId);
+
+    $.ajax({
+        url: 'mark_as_sold.php', // Create this PHP file
+        type: 'POST',
+        data: { plantid: plantId },
+        success: function(response) {
+            Swal.fire({
+                position: 'center',
+                icon: 'success',
+                title: 'Product marked as sold',
+                showConfirmButton: false,
+                timer: 3000
+            })
+
+            setTimeout(function() {
+                window.location.reload(); // Refresh the page or handle as needed
+            }, 2000);
+        },
+        error: function() {
+            alert('Error marking product as sold.');
+        }
+    });
+});
+
 
 // Logout AJAX
 $(document).on('click', '#logoutLink', function(event) {

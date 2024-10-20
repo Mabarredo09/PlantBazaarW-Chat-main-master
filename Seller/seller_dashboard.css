@@ -554,5 +554,20 @@ textarea {
     background-color: #0056b3;
 }
 
+.mark-sold-button {
+    background-color: #f44336; /* Red for Sold */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.mark-sold-button:hover {
+    background-color: #d32f2f; /* Darker red on hover */
+}
+
 
 
