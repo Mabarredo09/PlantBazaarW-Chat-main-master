@@ -6,6 +6,7 @@
 ### Report User
 ### Notification
 ### Re captcha on Login
+### Add Mark as Sold at Sold History
 
 ## Needed to do/fix:
 ### Hindi dapat lilitaw chat seller pag di nakalogin o kaya pag ikaw ang seller
