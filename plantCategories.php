@@ -49,6 +49,7 @@ if ($isLoggedIn) {
     <script src="node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
     <script src="https://www.google.com/recaptcha/enterprise.js?render=6Lcv5mUqAAAAABNZ9eLdrYxpn8OWSacrmhefh9I3"></script>
+    <script src="notif.js"></script>
     <title>Document</title>
 </head>
 <body>

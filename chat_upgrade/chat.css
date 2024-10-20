@@ -156,6 +156,10 @@
     text-overflow: ellipsis; /* Add ellipsis (...) for overflow */
     white-space: nowrap;
 }
+.message-time{
+    color: #aaa;
+    font-size: 0.8rem;
+}
 
 .message-item img{
     width: 400px;

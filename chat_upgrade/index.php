@@ -90,6 +90,20 @@ if(isset($_SESSION['email'])){
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function() {
+    // setupNotification();
+    requestNotificationPermission();
+    // Fetch messages immediately on load
+    fetchLatestMessages();
+    // Set interval to fetch new messages every 2 seconds
+    setInterval(fetchLatestMessages, 2000);
+    // // Set up event listener for refresh button
+
+
+
+
+
+
+
     // eto naman para sa option sa messages reply and delete function 
     var openMessageId = null;
 // Click event for ellipsis
@@ -111,22 +125,26 @@ $(document).on('click', '.ellipsis', function() {
         $('.user-container').removeClass('hide-users');
         console.log('Back button clicked');
     });
+
     // Click event for delete button
     $(document).on('click', '.delete-btn', function() {
         var messageId = $(this).data('message-id');
         console.log('Delete message ID:', messageId);
         // Implement delete functionality here
     });
+
     // Hide options when clicking outside
     $(document).on('click', function(event) {
         if (!$(event.target).closest('.message-options').length) {
             $('.options-menu').hide();
         }
     });
+
     // When the image upload icon is clicked para sa image to
     $('#image-upload-icon').on('click', function() {
         $('#image-upload').click();
     });
+
     $(document).on('click', '.message-image', function() {
         // Get the src of the clicked image
         var imageSrc = $(this).attr('src'); 
@@ -135,14 +153,17 @@ $(document).on('click', '.ellipsis', function() {
         // Show the overlay
         $('#fullscreen-overlay').fadeIn();
     });
+
     // When the overlay is clicked
     $('#close-overlay').on('click', function() {
         $('#fullscreen-overlay').fadeOut(); // Hide the overlay
     });
+
     // Optional: Hide the overlay if the user clicks anywhere on the overlay
     $('#fullscreen-overlay').on('click', function() {
         $(this).fadeOut(); // Hide the overlay
     });
+
     function loadUsers() {
         // Fetching the users from the database
         $.ajax({
@@ -188,19 +209,20 @@ $(document).on('click', '.ellipsis', function() {
             }
         });
     }
-            loadUsers();
+        //     loadUsers();
 
-        // Load users
-        function loadUsers() {
-            $.ajax({
-                url: "ajax/fetch_user.php",
-                type: "GET",
-                success: function(data) {
-                    $(".user-list").html(data);
-                    attachClickEvent();
-                }
-            });
-        }
+        // // Load users
+        // function loadUsers() {
+        //     $.ajax({
+        //         url: "ajax/fetch_user.php",
+        //         type: "GET",
+        //         success: function(data) {
+        //             $(".user-list").html(data);
+        //             attachClickEvent();
+        //         }
+        //     });
+        // }
+
     function report_user(){
         $('.report-btn').on('click', function(event) {
             var selectedUserId = $('.user.selected').attr('id');
@@ -347,18 +369,23 @@ document.querySelector('.refresh-btn').addEventListener('click', function() {
 // Polling function for new messages
 // Function to play notification sound
 // Assuming you have a variable for the logged-in user ID
+let notifiedMessageIds = [];
 let loggedInUserId = <?php echo $_SESSION['user_id']; ?>; // Replace with actual logged-in user ID
 let notificationAudio = new Audio('sounds/Notification-Sound.mp3');
 let unseenMessageCount = 0; // Tracks unseen messages
 let soundEnabled = true; // Enable sound notifications by default
+let isChatFocused = true;
+window.onfocus = function() { isChatFocused = true; };
+window.onblur = function() { isChatFocused = false; };
+
 function fetchLatestMessages() {
-    
     $.ajax({
         url: "ajax/fetch_latest_message.php",
-        method: "POST",
+        method: "GET",
         dataType: "json",
         success: function(response) {
             console.log("Response from server:", response);
+
             unseenMessageCount = 0; // Reset ang bilang ng unseen messages
 
             response.forEach(function(userMessage) {
@@ -369,27 +396,37 @@ function fetchLatestMessages() {
                 messagePreview.text(userMessage.message);
                 userElement.find('.time-stamp').text(userMessage.timestamp);
                 
-                console.log("Message status:", userMessage.status);
+                console.log("Message status:", userMessage.unseen_count);
                 console.log("User ID:", userMessage.user_id);
 
                 // Check kung ang message ay unseen at para sa naka-login na user
-                if (userMessage.status === '0' && userMessage.recipient_id == loggedInUserId) {
-                    unseenMessageCount++;
+                // if (userMessage.status === '0' && userMessage.recipient_id == loggedInUserId) {
+                //     unseenMessageCount++;
+                    
+                //     // Optional: maglagay ng visual cue sa UI
+                //     userElement.find('.message-notification').addClass('new-message');
 
-                    // Optional: maglagay ng visual cue sa UI
-                    userElement.find('.message-notification').addClass('new-message');
-                    setTimeout(function() {
-                    userElement.find('.message-notification').removeClass('new-message');
-                    }, 1000);
-                }
-            });
-
+                //     setTimeout(function() {
+                //     userElement.find('.message-notification').removeClass('new-message');
+                //     }, 1000);
+                // }
             // Mag-play ng tunog kung may unseen messages na para sa user
-            if (unseenMessageCount > 0 && soundEnabled || unseenMessageCount > 0) {
-            }
-            else{
-                notificationAudio.pause();
-            }
+            
+            if (userMessage.unseen_count >0 ) {
+
+                if (!notifiedMessageIds.includes(userMessage.id)){
+
+                // Play sound and show notification if the chat is not focused
+                if (!isChatFocused) {
+                        playNotificationSound();
+                        showBrowserNotification("New Message From "+ userMessage.recipient_name, "" + userMessage.notification);
+                    }
+                
+            }notifiedMessageIds.push(userMessage.id);
+            
+        }
+
+        });
         },
         error: function(jqXHR, textStatus, errorThrown) {
             console.log("AJAX error:", textStatus, errorThrown);
@@ -405,18 +442,38 @@ function playNotificationSound() {
     });
 }
 
+// Function to display browser notifications
+function showBrowserNotification(title, body) {
+    // Check if notifications are allowed
+    if (Notification.permission === 'granted') {
+        new Notification(title, {
+            body: body,
+            icon: 'images/message_icon.png' // Path to your notification icon
+        });
+    } else if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+                new Notification(title, {
+                    body: body,
+                    icon: 'images/message_icon.png'
+                });
+            }
+        });
+    }
+}
 
 
-
-// Function to set up notification permission and initial sound
-function setupNotification() {
-    Notification.requestPermission().then((permission) => {
-        if (permission === 'granted') {
-            console.log("Notification permission granted.");
-        } else {
-            console.log("Notification permission denied.");
-        }
-    });
+// Request permission for notifications on page load
+function requestNotificationPermission() {
+    if (Notification.permission !== 'granted') {
+        Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+                console.log("Notification permission granted.");
+            } else {
+                console.log("Notification permission denied.");
+            }
+        });
+    }
 }
 // Add an event listener to enable sound after first interaction
 document.addEventListener('click', () => {
@@ -425,19 +482,6 @@ document.addEventListener('click', () => {
 }, { once: true }); // This ensures it only runs once
 
 
-// Set up the notification on window load
-window.onload = function() {
-    // setupNotification();
-    
-    // Fetch messages immediately on load
-    fetchLatestMessages();
-
-    // Set interval to fetch new messages every 2 seconds
-    setInterval(fetchLatestMessages, 2000);
-
-    // Set up event listener for refresh button
-    document.querySelector('.refresh-btn').addEventListener('click', fetchLatestMessages);
-};
 
 
 
@@ -451,6 +495,11 @@ window.onload = function() {
         success: function(response) {
             console.log("Messages marked as seen for recipient:", selectedUserId);
         }
+    });
+
+    // Clear notified messages for this user
+    notifiedMessageIds = notifiedMessageIds.filter(id => {
+        return !$(`.message[data-id="${id}"]`).data('sender_id') === selectedUserId;
     });
 
     // Load messages for the selected user, assuming you have a function for that
@@ -469,6 +518,7 @@ $(document).on('click', '#report-btn', function() {
     // Redirect to report.php with the selected user's ID as a query parameter
     window.location.href = 'report.php?user_id=' + selectedUserId;
 });
+
 
 });
 </script>

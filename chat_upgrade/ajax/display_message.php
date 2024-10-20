@@ -36,6 +36,7 @@ if (isset($_GET['recipient_id']) && !empty($_GET['recipient_id'])) {
             // Display the original message first (sent message)
             echo "<div class='original-message'>";
             echo "<p class='message-text'>$message</p>";
+            echo "<p><span class='message-time'>$time</span></p>";
 
             // Display the image if it exists
             if (!empty($image)) {

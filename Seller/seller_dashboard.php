@@ -44,6 +44,8 @@ if ($isLoggedIn) {
     <link rel="stylesheet" href="seller_dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
     <script src="../node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+    <script src= "notif.js"></script>
     <title>Seller Dashboard</title>
 </head>
 <body>
@@ -107,7 +109,7 @@ include 'nav.php';
                 <div class="col-sm-6 mb-3">
                 <label class="form-label">Region <span class="text-danger">*</span></label>
                 <select name="region" class="region" id="region"></select>
-                <input type="text" class="region-text" name="region" id="region-text" required>
+                <input type="hidden" class="region-text" name="region" id="region-text" required>
                 </div>
                 <div class="col-sm-6 mb-3">
                 <label class="form-label">Province *</label>
@@ -203,7 +205,7 @@ include 'nav.php';
             <div class="col-sm-6 mb-3">
             <label class="form-label">Region <span style="color:red;">*</span></label>
             <select name="editregion" class="region" id="region1"></select>
-            <input type="hidden" class="editregion" name="editregion" id="region-text1" required>
+            <input type="text" class="editregion" name="editregion" id="region-text1" required>
             </div>
         <div class="col-sm-6 mb-3">
             <label class="form-label">Province *</label>
@@ -270,7 +272,6 @@ include 'nav.php';
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="ph-address-selector.js"></script>
-    <script src="ph-address-selector_1.js"></script>
     <script>
 
   // Add event listeners to image inputs to preview images
@@ -569,9 +570,6 @@ $(document).ready(function() {
     var plantId = $(this).data('plantid'); // Get the plant ID
     // Fetch the existing data for this plant and populate the modal fields
     console.log('plantId:', plantId);
-$.ajax({
-  // ...
-});
     $.ajax({
   url: 'fetch_listed_products.php', // URL to fetch product details
   type: 'GET',
@@ -588,6 +586,13 @@ $.ajax({
     $('.editcity').prop('value', data.city);
     $('.editbarangay').prop('value', data.barangay);
     $('.editstreet').prop('value', data.street);
+
+     // Pre-fill the region, province, city, and barangay dropdowns
+     $('#region1').prop('value',data.region);
+     $('#province1').val(data.province);
+     $('#city1').val(data.city);
+    $('#barangay1').val(data.barangay);
+
     $('#editplantdetails').prop('value', data.details);
     $('#editPlantcategories').prop('value', data.plantcategories);
     $('#editPlantSize').prop('value', data.plantSize);
@@ -596,18 +601,123 @@ $.ajax({
     $('#editImg1Preview').attr('src', '../Products/' + '<?php echo $_SESSION['email'] ?>' + '/' + data.img1).attr('alt', data.plantname).text(data.img1);
     $('#editImg2Preview').attr('src', '../Products/' + '<?php echo $_SESSION['email'] ?>' + '/' + data.img2).attr('alt', data.plantname).text(data.img2);
     $('#editImg3Preview').attr('src', '../Products/' + '<?php echo $_SESSION['email'] ?>' + '/' + data.img3).attr('alt', data.plantname).text(data.img3);
-    $('#editImg1Label').text(data.img1);
-    $('#editImg2Label').text(data.img2);
-    $('#editImg3Label').text(data.img3);
+    // $('#editImg1Label').text(data.img1);
+    // $('#editImg2Label').text(data.img2);
+    // $('#editImg3Label').text(data.img3);
+
 
     // Open the edit modal
     $('#editProductModal').show();
+
+    // Reinitialize the address selector after loading the modal
+    initializeAddressSelectorForEdit(data.region, data.province, data.city, data.barangay);
   },
   error: function() {
     alert('Error fetching product data.');
   }
 });
 });
+
+function initializeAddressSelectorForEdit(selectedRegion, selectedProvince, selectedCity, selectedBarangay) {
+    // Clear and reload regions
+    let regionDropdown = $('#region1');
+    regionDropdown.val(regionDropdown.find('option:selected').text());
+    regionDropdown.append('<option selected="true" disabled>Choose Region</option>');
+    
+    const regionUrl = 'ph-json/region.json'; // Adjust the path accordingly
+    $.getJSON(regionUrl, function(data) {
+        console.log("Loaded region JSON:", data);
+        $.each(data, function(key, entry) {
+            regionDropdown.append($('<option></option>').attr('value', entry.region_code).text(entry.region_name));
+        });
+        regionDropdown.val(selectedRegion); // Set selected region
+        regionDropdown.trigger('change'); // Trigger the province dropdown to populate based on region
+        $('#region-text1').val(regionDropdown.find('option:selected').text()); // Fill hidden input with name
+        $('#region1').val(regionDropdown.find('option:selected').text()); // Fill hidden input with name
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+        console.error("Error loading region JSON:", textStatus, errorThrown);
+    });
+
+    // When region changes, fill provinces, and select the appropriate one
+    $('#region1').on('change', function() {
+        fillProvinces('#province1', selectedProvince);
+        let selectedRegionName = $(this).find('option:selected').text(); // Get the selected region name
+        $('#region-text1').val(selectedRegionName); // Fill hidden input with region name
+    });
+
+    // When province changes, fill cities, and select the appropriate one
+    $('#province1').on('change', function() {
+        fillCities('#city1', selectedCity);
+    });
+
+    // When city changes, fill barangays, and select the appropriate one
+    $('#city1').on('change', function() {
+        fillBarangays('#barangay1', selectedBarangay);
+    });
+}
+
+function fillProvinces(provinceDropdownSelector, selectedProvince) {
+    let provinceDropdown = $(provinceDropdownSelector);
+    let regionCode = $('#region1').val();
+    provinceDropdown.empty();
+    provinceDropdown.append('<option selected="true" disabled>Choose Province</option>');
+    
+    const provinceUrl = 'ph-json/province.json'; // Adjust the path accordingly
+    $.getJSON(provinceUrl, function(data) {
+        var result = data.filter(function(value) {
+            return value.region_code == regionCode;
+        });
+
+        $.each(result, function(key, entry) {
+            provinceDropdown.append($('<option></option>').attr('value', entry.province_code).text(entry.province_name));
+        });
+
+        provinceDropdown.val(selectedProvince); // Set selected province
+        provinceDropdown.trigger('change'); // Trigger the city dropdown to populate based on province
+    });
+}
+
+function fillCities(cityDropdownSelector, selectedCity) {
+    let cityDropdown = $(cityDropdownSelector);
+    let provinceCode = $('#province1').val();
+    cityDropdown.empty();
+    cityDropdown.append('<option selected="true" disabled>Choose City</option>');
+    
+    const cityUrl = 'ph-json/city.json'; // Adjust the path accordingly
+    $.getJSON(cityUrl, function(data) {
+        var result = data.filter(function(value) {
+            return value.province_code == provinceCode;
+        });
+
+        $.each(result, function(key, entry) {
+            cityDropdown.append($('<option></option>').attr('value', entry.city_code).text(entry.city_name));
+        });
+
+        cityDropdown.val(selectedCity); // Set selected city
+        cityDropdown.trigger('change'); // Trigger the barangay dropdown to populate based on city
+    });
+}
+
+function fillBarangays(barangayDropdownSelector, selectedBarangay) {
+    let barangayDropdown = $(barangayDropdownSelector);
+    let cityCode = $('#city1').val();
+    barangayDropdown.empty();
+    barangayDropdown.append('<option selected="true" disabled>Choose Barangay</option>');
+    
+    const barangayUrl = 'ph-json/barangay.json'; // Adjust the path accordingly
+    $.getJSON(barangayUrl, function(data) {
+        var result = data.filter(function(value) {
+            return value.city_code == cityCode;
+        });
+
+        $.each(result, function(key, entry) {
+            barangayDropdown.append($('<option></option>').attr('value', entry.brgy_code).text(entry.brgy_name));
+        });
+
+        barangayDropdown.val(selectedBarangay); // Set selected barangay
+    });
+}
+
 
 // Handle the delete button click
 $(document).on('click', '.delete-button', function() {
