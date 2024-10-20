@@ -10,6 +10,8 @@
 
 ## Needed to do/fix:
 ### Hindi dapat lilitaw chat seller pag di nakalogin o kaya pag ikaw ang seller
+### Pagination sa Plant Categories
+### Search sa Plant Categories
 ### Email Verification sa Registration
 ### Wala pang about saka contact section
 ### Edit Profile Kulang kulang pa
